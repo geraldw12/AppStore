@@ -14,11 +14,27 @@ def index(request):
     ## Use raw query to get all objects
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM customers ORDER BY customerid DESC")
-        customers = cursor.fetchall()
+        user = cursor.fetchone()
 
-    result_dict = {'records': customers}
+    # result_dict = {'records': customers}
 
-    return render(request,'app/index.html',result_dict)
+    return render(request,'app/index.html',user)
+
+def login(request):
+    username = request.POST['username']
+    return render(request, 'app/login.html')
+
+def pending(request, id):
+    """Shows the pending page"""
+    
+    ## Use raw query to get a customer
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT pf.username, pf.email, pf.phonenum, pf.year_exp, round(t.avg_rating, 2) = %s", [id])
+        customer = cursor.fetchone()
+    result_dict = {'cust': customer}
+
+    return render(request,'app/view.html',result_dict)
+
 
 # Create your views here.
 def view(request, id):
